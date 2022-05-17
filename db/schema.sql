@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS department;
 
 CREATE TABLE department (
-    id INTEGER PRIMARY KEY,
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(30)
 );

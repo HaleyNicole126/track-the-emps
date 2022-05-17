@@ -1,5 +1,6 @@
 const express = require("express");
 const mysql = require("mysql2");
+const inputCheck = require('./utils/inputCheck');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -22,25 +23,86 @@ const db = mysql.createConnection(
 );
 
 // // GET all departments
-db.query(`SELECT * FROM department`, (err, rows) => {
-  console.log(rows);
+app.get('/api/department', (req, res) => {
+  const sql = `SELECT * FROM department`;
+
+  db.query(sql, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: 'success',
+      data: rows
+    });
+  });
 });
 
-// // GET a single department
-// db.query(`SELECT * FROM department WHERE id = 1`, (err, row) => {
-//   if (err) {
-//     console.log(err);
-//   }
-//   console.log(row);
-// });
+// GET a single department
+app.get('/api/department/:id', (req, res) => {
+  const sql = `SELECT * FROM department WHERE id = ?`;
+  const params = [req.params.id];
+
+  db.query(sql, params, (err, row) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: 'success',
+      data: row
+    });
+  });
+});
 
 // DELETE a department
-// db.query(`DELETE FROM department WHERE id = ?`, 1, (err, result) => {
-//   if (err) {
-//     console.log(err);
-//   }
-//   console.log(result);
-// });
+app.delete('/api/department/:id', (req, res) => {
+  const sql = `DELETE FROM department WHERE id = ?`;
+  const params = [req.params.id];
+
+  db.query(sql, params, (err, result) => {
+    if (err) {
+      res.statusMessage(400).json({ error: res.message });
+    } else if (!result.affectedRows) {
+      res.json({
+        message: 'Department not found'
+      });
+    } else {
+      res.json({
+        message: 'deleted',
+        changes: result.affectedRows,
+        id: req.params.id
+      });
+    }
+  });
+});
+
+// CREATE a department
+app.post('/api/department', ({ body }, res) => {
+  const errors = inputCheck(
+    body,
+    "id",
+    "name"
+  );
+  if (errors) {
+    res.status(400).json({ error: errors });
+    return;
+  }
+  const sql = `INSERT INTO department (id, name)
+  VALUES (?, ?)`;
+  const params = [body.id, body.name];
+
+  db.query(sql, params, (err, result) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: "success",
+      data: body
+    });
+  });
+});
 
 // CREATE a departmnet
 // const sql = `INSERT INTO department (id, name)
