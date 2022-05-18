@@ -81,16 +81,15 @@ app.delete('/api/department/:id', (req, res) => {
 app.post('/api/department', ({ body }, res) => {
   const errors = inputCheck(
     body,
-    "id",
     "name"
   );
   if (errors) {
     res.status(400).json({ error: errors });
     return;
   }
-  const sql = `INSERT INTO department (id, name)
-  VALUES (?, ?)`;
-  const params = [body.id, body.name];
+  const sql = `INSERT INTO department (name)
+  VALUES (?)`;
+  const params = [body.name];
 
   db.query(sql, params, (err, result) => {
     if (err) {
