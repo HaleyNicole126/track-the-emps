@@ -62,7 +62,7 @@ app.delete('/api/department/:id', (req, res) => {
 
   db.query(sql, params, (err, result) => {
     if (err) {
-      res.statusMessage(400).json({ error: res.message });
+      res.status(400).json({ error: res.message });
     } else if (!result.affectedRows) {
       res.json({
         message: 'Department not found'
@@ -144,6 +144,29 @@ app.get('/api/role/:id', (req, res) => {
     });
   });
 });
+
+// DELETE a role 
+app.delete('/api/role/:id', (req, res) => {
+  const sql = `DELETE FROM role WHERE id = ?`;
+  const params = [req.params.id];
+  db.query(sql, params, (err, result) => {
+    if (err) {
+      res.status(400).json({ error: res.message });
+      // checks if anything was deleted
+    } else if (!result.affectedRows) {
+      res.json({
+        message: 'Role not found'
+      });
+    } else {
+      res.json({
+        message: 'deleted',
+        changes: result.affectedRows,
+        id: req.params.id
+      });
+    }
+  });
+});
+
 
 // Default response for any other request (Not Found)
 app.use((req, res) => {
