@@ -103,17 +103,47 @@ app.post('/api/department', ({ body }, res) => {
   });
 });
 
-// CREATE a departmnet
-// const sql = `INSERT INTO department (id, name)
-//               VALUES (?, ?)`;
-// const params = [1, 'Senior Management'];
+// // GET all roles
+app.get('/api/role', (req, res) => {
+  const sql = `SELECT role.*, department.name
+          AS departmnet_name
+          FROM role
+          LEFT JOIN department
+          ON role.department_id = department.id`;
 
-// db.query(sql, params, (err, result) => {
-//   if (err) {
-//     console.log(err);
-//   }
-//   console.log(result);
-// });
+  db.query(sql, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: 'success',
+      data: rows
+    });
+  });
+});
+
+// GET a single role
+app.get('/api/role/:id', (req, res) => {
+  const sql = `SELECT role.*, department.name
+            AS department_name
+            FROM role
+            LEFT JOIN department
+            ON role.department_id = department.id
+            WHERE role.id = ?`;
+  const params = [req.params.id];
+
+  db.query(sql, params, (err, row) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: 'success',
+      data: row
+    });
+  });
+});
 
 // Default response for any other request (Not Found)
 app.use((req, res) => {
