@@ -145,6 +145,32 @@ app.get('/api/role/:id', (req, res) => {
   });
 });
 
+// CREATE a role
+app.post('/api/role', ({ body }, res) => {
+  const errors = inputCheck(
+    body,
+    "name"
+  );
+  if (errors) {
+    res.status(400).json({ error: errors });
+    return;
+  }
+  const sql = `INSERT INTO role (name)
+  VALUES (?)`;
+  const params = [body.name];
+
+  db.query(sql, params, (err, result) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: "success",
+      data: body
+    });
+  });
+});
+
 // DELETE a role 
 app.delete('/api/role/:id', (req, res) => {
   const sql = `DELETE FROM role WHERE id = ?`;
@@ -167,6 +193,53 @@ app.delete('/api/role/:id', (req, res) => {
   });
 });
 
+// CREATE an employee
+app.post('/api/employee', ({ body }, res) => {
+  const errors = inputCheck(
+    body,
+    'first_name', 'last_name', 'role_id', 'manager_id'
+  );
+  if (errors) {
+    res.status(400).json({ error: errors });
+    return;
+  }
+  const sql = `INSERT INTO employee (body.first_name, body.last_name, body.role_id, body.manager_id)
+  VALUES (?, ?, ?, ?)`;
+  const params = [body.name];
+
+  db.query(sql, params, (err, result) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: "success",
+      data: body
+    });
+  });
+});
+
+// // GET all employees
+app.get('/api/employee', (req, res) => {
+  const sql = `SELECT 
+  e.id, e.first_name, e.last_name, role.title AS job_title, department.name AS department,     
+  role.salary AS salary, CONCAT(m.first_name, ' ', m.last_name) AS manager
+  FROM employee e 
+  LEFT JOIN role on e.role_id = role.id
+  LEFT JOIN employee m ON m.id = e.manager_id
+  LEFT JOIN department on role.department_id = department.id`;
+
+  db.query(sql, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: 'success',
+      data: rows
+    });
+  });
+});
 
 // Default response for any other request (Not Found)
 app.use((req, res) => {
