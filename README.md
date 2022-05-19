@@ -17,8 +17,23 @@
   Track the Emps is a command-line application that helps users view and manage the departments, roles, and employees in a company. This project utilizes Node.js, Inquirer, and MySQL to create a content management system to manage a company's employee database. 
 
   ## Walkthrough
+  - Walkthrough video: https://youtu.be/sICxdOChUZs
 
   ## Screenshots
+  - Starting the application:
+  
+  ![image](https://user-images.githubusercontent.com/94570754/169350331-790939da-0573-46be-a593-c6b017f31a59.png)
+
+
+  - View-all-employees table:
+  
+  ![image](https://user-images.githubusercontent.com/94570754/169350553-378f9812-01d5-4102-b759-cba33536de35.png)
+
+
+  - Add-an-employee prompts:
+
+  ![image](https://user-images.githubusercontent.com/94570754/169351150-884f6baa-318d-43af-a5e8-5191edc19ec5.png)
+
 
   ## Installation
   Run `npm i` from the root directory to install the necessary dependencies. Then, you should be ready to run the application from your command line.
@@ -30,7 +45,7 @@
   Contributions welcome! Please use the information in the 'Questions' Section to contact me or submit a GitHub Issue. 
 
   ## Tests
-  I utilized Insomnia to test the routes before integrating the queries with the Inquirer prompts. The routes that I tested before integrating Inquirer are in the routes/apiRoutes directory. 
+  I utilized Insomnia to test the routes before integrating the queries with the Inquirer prompts. The routes that I tested before integrating Inquirer are in the routes/apiRoutes directory.
 
   ## License 
 
@@ -40,7 +55,8 @@
 
   ## Questions
   Please reach out with any additional questions: 
-  - [GitHub](https://github.com/haleynicole126)
+  - [GitHub Profile](https://github.com/haleynicole126)
+  - [Project Repository](https://github.com/HaleyNicole126/track-the-emps/)
   - Email: haleynicole126@gmail.com
 
 
