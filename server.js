@@ -5,6 +5,7 @@ const apiRoutes = require("./routes/apiRoutes");
 const inquirer = require("inquirer");
 const cTable = require("console.table");
 const db = require("./db/connection");
+const { response } = require("express");
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -32,6 +33,13 @@ const promptMenu = () => {
           "add-a-role",
           "add-an-employee",
           "update-an-employee-role",
+          "update-an-employee-manager",
+          // "view-employees-by-manager",
+          // "view-employees-by-dept",
+          "delete-dept",
+          "delete-role",
+          "delete-employee",
+          // "view-dept-budget"
         ],
       },
     ])
@@ -56,8 +64,31 @@ const promptMenu = () => {
           addEmp();
           break;
         case "update-an-employee-role":
-          updateEmp();
+          updateEmpRole();
           break;
+        case "update-an-employee-manager":
+          updateEmpMgr();
+          break;
+        // case
+        //   "view-employees-by-dept":
+        //   viewEmpDept();
+        //   break;
+        case
+          "delete-dept":
+          deleteDept();
+          break;
+        case
+          "delete-role":
+          deleteRole();
+          break;
+        case
+          "delete-employee":
+          deleteEmp();
+          break;
+        // case
+        //   "view-dept-budget":
+        //   viewBudget();
+        //   break;
       }
     });
 };
@@ -69,7 +100,7 @@ function viewAllDept() {
     console.table(results);
     promptMenu();
   });
-};
+}
 
 // viewAllRole()
 function viewAllRole() {
@@ -85,7 +116,7 @@ function viewAllRole() {
       promptMenu();
     }
   );
-};
+}
 
 // viewAllEmp()
 function viewAllEmp() {
@@ -103,7 +134,7 @@ function viewAllEmp() {
       promptMenu();
     }
   );
-};
+}
 
 // addDept()
 function addDept() {
@@ -123,13 +154,211 @@ function addDept() {
         }
       );
     });
-};
+}
 
 // addRole()
+function addRole() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "jobTitle",
+        message: "Job Title:",
+      },
+      {
+        type: "input",
+        name: "salary",
+        message: "Role Salary:",
+      },
+      {
+        type: "input",
+        name: "deptId",
+        message: "Department ID:",
+      },
+    ])
+    .then((rname) => {
+      const sql = `INSERT INTO role (title, salary, department_id) VALUES (?,?,?)`;
+      const params = [rname.jobTitle, rname.salary, rname.deptId];
+      db.query(sql, params, (err, result) => {
+        if (err) {
+          console.log(err);
+        }
+        console.log("Success! Role Added");
+        viewAllRole();
+      });
+    });
+}
 
 // addEmp()
+function addEmp() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "first_name",
+        message: "First Name:",
+      },
+      {
+        type: "input",
+        name: "last_name",
+        message: "Last Name:",
+      },
+      {
+        type: "input",
+        name: "role_id",
+        message: "Role ID:",
+      },
+      {
+        type: "input",
+        name: "manager_id",
+        message: "Manager ID",
+      },
+    ])
+    .then((empname) => {
+      const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+    VALUES (?,?,?,?)`;
+      const params = [
+        empname.first_name,
+        empname.last_name,
+        empname.role_id,
+        empname.manager_id,
+      ];
+      db.query(sql, params, (err, result) => {
+        if (err) {
+          console.log(err);
+        }
+        console.log("Success! Employee added");
+        viewAllEmp();
+      });
+    });
+}
 
 // updateEmp()
+function updateEmpRole() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "employee_id",
+        message:
+          "Employee ID of the Employee to update:",
+      },
+      {
+        type: "input",
+        name: "role_id",
+        message: "What is the Role ID of their new position?",
+      },
+    ])
+    .then((emprole) => {
+      const sql = `UPDATE employee SET role_id = ? WHERE id = ?`;
+      const params = [emprole.role_id, emprole.employee_id];
+      db.query(sql, params, (err, result) => {
+        if (err) {
+          console.log(err);
+        }
+        console.log("Success! Role updated");
+        viewAllEmp();
+      });
+    });
+};
+
+// updateEmp()
+function updateEmpMgr() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "employee_id",
+        message:
+          "Employee ID of the Employee to update:",
+      },
+      {
+        type: "input",
+        name: "manager_id",
+        message: "What is their new manager's ID?",
+      },
+    ])
+    .then((empmgr) => {
+      const sql = `UPDATE employee SET manager_id = ? WHERE id = ?`;
+      const params = [empmgr.manager_id, empmgr.employee_id];
+      db.query(sql, params, (err, result) => {
+        if (err) {
+          console.log(err);
+        }
+        console.log("Success! Manager updated");
+        viewAllEmp();
+      });
+    });
+}
+
+// Delete Department
+function deleteDept() {
+  inquirer.prompt(
+    {
+      type: "input",
+      name: "dept_id",
+      message: "Department ID to delete: "
+    }
+  )
+  .then((response) => {
+    const sql = `DELETE FROM department WHERE id = ?`;
+    const params = [response.dept_id];
+
+    db.query(sql, params, (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      console.log("successfully deleted department");
+      viewAllDept();
+    });
+  })
+}
+
+// Delete Role
+function deleteRole() {
+  inquirer.prompt(
+    {
+      type: "input",
+      name: "role_id",
+      message: "Role ID to delete: "
+    }
+  )
+  .then((response) => {
+    const sql = `DELETE FROM role WHERE id = ?`;
+    const params = [response.role_id];
+
+    db.query(sql, params, (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      console.log("successfully deleted role");
+      viewAllRole();
+    });
+  })
+}
+
+// Delete Employee
+function deleteEmp() {
+  inquirer.prompt(
+    {
+      type: "input",
+      name: "employee_id",
+      message: "Employee ID to delete: "
+    }
+  )
+  .then((response) => {
+    const sql = `DELETE FROM employee WHERE id = ?`;
+    const params = [response.employee_id];
+
+    db.query(sql, params, (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      console.log("successfully deleted employee");
+      viewAllEmp();
+    });
+  })
+}
 
 promptMenu();
 // Default response for any other request (Not Found)
